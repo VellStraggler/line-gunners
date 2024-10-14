@@ -33,13 +33,13 @@ To recreate the development environment, you need the following software and/or 
 I found these websites useful in developing this software:
 
 * [Website Title](Link)
-*
+* [Intersecting Polygons](https://stackoverflow.com/questions/753140/how-do-i-determine-if-two-convex-polygons-intersect#:~:text=To%20be%20able%20to%20decide,polygons%20forms%20such%20a%20line)
 *
 
 ## Future Work
 
 The following items I plan to fix, improve, and/or add to this project in the future:
 
-* [ ] First thing here
-* [ ]
-* [ ]
+* [ ] Collision Geometry and Detection
+* [ ] Borders
+* [ ] Sprite Children
