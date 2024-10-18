@@ -67,7 +67,7 @@ public class Window extends Frame {
         // Draw the images onto the drawingsGraphics image
         for (Projectile object: projectiles) {
             drawingsGraphics.setColor(Color.red);
-            drawingsGraphics.drawRect(object.getCornerPoint().x + 2, object.getCornerPoint().y + 2, 2, 2);
+            drawingsGraphics.drawRect(object.getCornerPoint().x + 3, object.getCornerPoint().y + 3, 2, 2);
             // this is never cleared like the offscreen
         }
         offScreenGraphics.drawImage(drawingsLayer,0 ,0, this);

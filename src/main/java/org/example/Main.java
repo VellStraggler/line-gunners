@@ -21,6 +21,7 @@ public class Main {
     public static List<Object> objects = new ArrayList<>();
     public static List<Projectile> projectiles = new ArrayList<>();
     public static BufferedImage drawingsLayer;
+    public static boolean runGame;
 
     public static int step = 1;
 
@@ -28,6 +29,7 @@ public class Main {
         System.out.println("Beginning program...");
         objects.add(player1);
         objects.add(player2);
+        runGame = true;
 
         Window window = new Window(objects, projectiles);
         window.setFocusable(true);
@@ -52,7 +54,7 @@ public class Main {
         int nextSecond = LocalTime.now().getSecond() + 1;
         int inc = 0;
         int inc2 = 0;
-        while(true) {
+        while(runGame) {
             //Print every 120th of a second
             currFrame = System.currentTimeMillis();
             if (currFrame >= nextFrame) {
@@ -81,6 +83,7 @@ public class Main {
             //input is checked automatically by the window
 
         }
+        System.out.println("Game over! Not a clue who won, figure it out.");
     }
     private static void moveProjectiles() {
         for (Projectile projectile: projectiles) {
@@ -117,9 +120,17 @@ public class Main {
                     }
                 }
                 // Compare its geometry to the lines on the drawingLayer
+                Point requestedCorner = new Point(movingObject.getCornerPoint().x + movingObject.getRequestedChange().x,
+                    movingObject.getCornerPoint().y + movingObject.getRequestedChange().y);
+                // Check if anyone is hit
                 if (drawingsLayer != null) {
-                    Point requestedCorner = new Point(movingObject.getCornerPoint().x + movingObject.getRequestedChange().x,
-                            movingObject.getCornerPoint().y + movingObject.getRequestedChange().y);
+                    for (int y = movingObject.getCornerPoint().y; y < movingObject.getCornerPoint().y + movingObject.height; y++) {
+                        for (int x = movingObject.getCornerPoint().x; x < movingObject.getCornerPoint().x + movingObject.width; x++) {
+                            if (new Color(drawingsLayer.getRGB(x, y), true).equals(Color.red)) {
+                                runGame = false;
+                            }
+                        }
+                    }
                     for (int y = requestedCorner.y; y < requestedCorner.y + movingObject.height; y++) {
                         for (int x = requestedCorner.x; x < requestedCorner.x + movingObject.width; x++) {
                             if (new Color(drawingsLayer.getRGB(x, y), true).equals(Color.red)) {

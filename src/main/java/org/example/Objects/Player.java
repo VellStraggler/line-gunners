@@ -18,8 +18,8 @@ public class Player extends Sprite{
      * Shoot a thin straight line off the direction being faced
      */
     public Projectile shoot() {
-        Point spawnPoint = new Point(getCenterPoint().x + (direction.x * width),
-                getCenterPoint().y + (direction.y * height));
+        Point spawnPoint = new Point(getCenterPoint().x + (direction.x * (width/3*2)),
+                getCenterPoint().y + (direction.y * (height/3*2)));
         Point shotDirection = new Point(direction.x, direction.y);
         int shotSpeed = 2;
         Projectile shot = new Projectile("bullet.png", spawnPoint, shotDirection, shotSpeed);
@@ -55,9 +55,9 @@ public class Player extends Sprite{
         this.timeLastFired = System.currentTimeMillis();
     }
     private boolean canFireLaser() {
-        return System.currentTimeMillis() > timeLastFired + (laserCoolDown * 1000);
+        return System.currentTimeMillis() > timeLastFired + (laserCoolDown * 100);
     }
     private boolean canPlaceBomb() {
-        return System.currentTimeMillis() > timeLastFired + (bombCoolDown * 1000);
+        return System.currentTimeMillis() > timeLastFired + (bombCoolDown * 100);
     }
 }
