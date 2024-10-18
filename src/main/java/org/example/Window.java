@@ -1,11 +1,14 @@
 package org.example;
 
 import org.example.Objects.Object;
+import org.example.Objects.Player;
+import org.example.Objects.Projectile;
 import org.example.Objects.Sprite;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class Window extends Frame {
@@ -15,13 +18,17 @@ public class Window extends Frame {
     public static final Point CENTER = new Point(WIDTH/2,HEIGHT/2);
 
     Image offScreenImage;
-    Graphics offScreenGraphics;
+    BufferedImage drawingsLayer;
+    Graphics2D drawingsGraphics;
+    Graphics2D offScreenGraphics;
     AffineTransform transform;
 
     public List<Object> objects;
+    public List<Projectile> projectiles;
 
-    public Window(List<Object> objects) {
+    public Window(List<Object> objects, List<Projectile> projectiles) {
         this.objects = objects;
+        this.projectiles = projectiles;
         // Set up the window
         setSize(WIDTH, HEIGHT);
         setTitle("Line Gunner");
@@ -45,17 +52,36 @@ public class Window extends Frame {
 
     // Override the paint method for double-buffered drawing
     public void paint(Graphics2D g) {
-        if (offScreenImage == null) {
+        if (offScreenImage == null || drawingsLayer == null) {
             offScreenImage = createImage(WIDTH, HEIGHT);
-            offScreenGraphics = offScreenImage.getGraphics();
+            drawingsLayer = (BufferedImage) createImage(WIDTH, HEIGHT);
+            offScreenGraphics = (Graphics2D) offScreenImage.getGraphics();
+            // this directly modifies the offScreenImage, which is
+            // then drawn to the main graphics g
+            drawingsGraphics = (Graphics2D) drawingsLayer.getGraphics();
         }
-        Graphics2D offScreenGraphics2D = (Graphics2D) offScreenGraphics;
 
         // Clear the offscreen image first
         offScreenGraphics.clearRect(0, 0, WIDTH, HEIGHT);
 
-        // Draw the images onto the offscreen image
+        // Draw the images onto the drawingsGraphics image
+        for (Projectile object: projectiles) {
+            drawingsGraphics.setColor(Color.red);
+            drawingsGraphics.drawRect(object.getCornerPoint().x + 2, object.getCornerPoint().y + 2, 2, 2);
+            // this is never cleared like the offscreen
+        }
+        offScreenGraphics.drawImage(drawingsLayer,0 ,0, this);
         for (Object object: objects) {
+            if (object instanceof Player) {
+                Player player = (Player) object;
+                // BOMBS
+                if (player.willPlaceBomb) {
+                    drawingsGraphics.setColor(Color.white);
+                    drawingsGraphics.fillOval(player.getCenterPoint().x - player.width, player.getCenterPoint().y - player.height,
+                            player.width * 2, player.height * 2);
+                    player.willPlaceBomb = false;
+                }
+            }
             if (object instanceof Sprite) {
                 Sprite sprite = (Sprite) object;
 
@@ -70,11 +96,11 @@ public class Window extends Frame {
                     transform.translate(cornerPoint.x, cornerPoint.y);
                 }
 
-                offScreenGraphics2D.drawImage(sprite.image, transform, this);
+                offScreenGraphics.drawImage(sprite.image, transform, this);
 //                offScreenGraphics.drawImage(sprite.image, cornerPoint.x, cornerPoint.y, this);
                 // draw a circle representing the geometry of each sprite
-//                offScreenGraphics2D.drawOval(cornerPoint.x, cornerPoint.y + (sprite.height/2) - (sprite.width/2), sprite.width, sprite.width);
-                offScreenGraphics2D.drawRect(cornerPoint.x, cornerPoint.y, sprite.width, sprite.height);
+//                offScreenGraphics.drawOval(cornerPoint.x, cornerPoint.y + (sprite.height/2) - (sprite.width/2), sprite.width, sprite.width);
+//                offScreenGraphics.drawRect(cornerPoint.x, cornerPoint.y, sprite.width, sprite.height);
             }
         }
 

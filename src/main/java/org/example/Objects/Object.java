@@ -1,7 +1,4 @@
 package org.example.Objects;
-
-import org.example.DoublePoint;
-
 import java.awt.*;
 
 import static org.example.Window.CENTER;
@@ -14,8 +11,7 @@ import static org.example.Window.CENTER;
 public class Object {
     public static final int zLevel = 0;
 
-    private Point cornerPoint;// a rounded version of decimalPoint
-//    private DoublePoint decimalPoint;
+    private Point cornerPoint;
     private Point centerPoint;
     // Geometry is calculated as the center of the largest lower square of the sprite
     private Point requestedChange;
@@ -28,20 +24,24 @@ public class Object {
      * @param spawnPoint: This reflects the center of the sprite, not the corner
      */
     public Object(Point spawnPoint) {
-        requestedChange = new Point(0,0);
         if (spawnPoint == null) {
             spawnPoint = CENTER;
         }
+        requestedChange = new Point(0,0);
         centerPoint = new Point(0,0);
         cornerPoint = new Point(0,0);
-//        decimalPoint = new DoublePoint(0.0, 0.0);
         updateCenter(spawnPoint);
 
     }
     public boolean wantsToMove() {
         return requestedChange.x != 0 || requestedChange.y != 0;
     }
-    public void requestMoveTo(Point newPoint) {
+
+    /**
+     * This is the amount to add, not the new local position.
+     * @param newPoint
+     */
+    public void requestMove(Point newPoint) {
         requestedChange.x = newPoint.x;
         requestedChange.y = newPoint.y;
     }
@@ -60,6 +60,10 @@ public class Object {
         updateCenter(newPoint);
         resetRequest();
     }
+    public void acceptMoveRequest() {
+        updateCenter(getRequestedPoint());
+        resetRequest();
+    }
     public void moveX(int x){
         moveTo(new Point(cornerPoint.x + x, cornerPoint.y));
     }
@@ -76,19 +80,25 @@ public class Object {
     public Point getCenterPoint() { return new Point(centerPoint.x, centerPoint.y);}
 
     /**
-     * Returns the center point with the requested change
+     * Returns the center point with the requested change added to it
      * @return
      */
     public Point getRequestedPoint() { return new Point(centerPoint.x + requestedChange.x, centerPoint.y + requestedChange.y);}
+
+    /**
+     *
+     * @return the amount of positional change this object wants
+     */
     public Point getRequestedChange() {
         return new Point(requestedChange.x, requestedChange.y);
     }
     private void updateCenter(Point newCenter) {
-        centerPoint = newCenter;
+        centerPoint.x = newCenter.x;
+        centerPoint.y = newCenter.y;
         cornerPoint.x = newCenter.x - (width / 2);
         cornerPoint.y = newCenter.y - (height / 2);
     }
-    private void updateCorner(Point newCorner) {
+    void updateCorner(Point newCorner) {
         cornerPoint = newCorner;
         centerPoint.x = newCorner.x + (width / 2);
         centerPoint.y = newCorner.y + (height / 2);

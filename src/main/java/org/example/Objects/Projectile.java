@@ -2,17 +2,17 @@ package org.example.Objects;
 
 import java.awt.*;
 
-public class Projectile extends Object{
+public class Projectile extends Sprite{
     public static final int zLevel = -1;
-    private int direction; //out of 360
-    private int speed;
-    private int lifespan; //in seconds
+    public Point direction;
 
-    public Projectile(Point spawnPoint, int direction, int speed, int lifespan) {
-        super(spawnPoint);
+    public Projectile(String path, Point spawnPoint, Point direction, int speed) {
+        super(path, spawnPoint);
         this.direction = direction;
         this.speed = speed;
-        this.lifespan = lifespan;
+    }
+    public void requestMovementUpdate() {
+        requestMove(new Point(direction.x * speed, direction.y * speed));
     }
 
 }

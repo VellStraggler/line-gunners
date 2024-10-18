@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import static java.lang.Integer.signum;
+
 /**
  * Sprites can be linked to children sprites
  * circular collision geometry for players
@@ -26,12 +28,13 @@ public class Sprite extends Object{
     public String imagePath;
     public Image image;
 
-    public int direction; // -180 to 180 degrees
+    public Point direction;
     public int speed;
     private boolean facingLeft;
 
 
     /**
+     * By default, the sprite is facing east
      * @param imagePath: Do not include "images/", this is automatically added
      * @param spawnPoint: This reflects the center of the sprite, not the corner
      */
@@ -41,7 +44,7 @@ public class Sprite extends Object{
         this.imagePath = imagePath;
         rotation = 0.0;
         facingLeft = false;
-        direction = 90;
+        direction = new Point(1,0);
         speed = 0;
 
         try {
@@ -52,15 +55,8 @@ public class Sprite extends Object{
             System.out.println("Image could not be loaded with path: " + PATH_PREFIX + imagePath);
             e.printStackTrace();
         }
+        updateCorner(spawnPoint); // accounts for previously null width and height
 
-    }
-    public void moveTo(Point point) {
-        if (getRequestedChange().x < 0) {
-            facingLeft = true;
-        } else {
-            facingLeft = false;
-        }
-        super.moveTo(point);
     }
     /**
      * Rotates the current sprite and all childrenSprites
@@ -75,27 +71,6 @@ public class Sprite extends Object{
             sprite.rotate(addedRotation);
         }
     }
-
-    /**
-     * has an assumed force of 0.
-     * @param degrees
-     */
-    public void avgDirection(int[] degrees) {
-        int sum = 0;
-        for(int i = 0; i < degrees.length; i++) {
-            sum += degrees[i];
-        }
-        sum /= degrees.length;
-        double changeInX = direction / 90;
-        moveX(0);
-
-
-        if (direction > 180) {
-            facingLeft = true;
-        } else {
-            facingLeft = false;
-        }
-    }
     public boolean isFacingLeft() {
         return facingLeft;
     }
@@ -106,6 +81,30 @@ public class Sprite extends Object{
         rotation = (rotation + addedRotation)%360;
         if (rotation < 0) {
             rotation += 360;
+        }
+    }
+    public boolean wantsToMove() {
+        if (!super.wantsToMove()) {
+            return (direction.x != 0 || direction.y != 0);
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * These can never both be 0.
+     * @param x
+     * @param y
+     */
+    public void setFacing(int x, int y) {
+        if (x != 0 || y != 0) {
+            direction.x = signum(x);
+            direction.y = signum(y);
+        }
+        if (x < 0) {
+            facingLeft = true;
+        } else if (x > 0) {
+            facingLeft = false;
         }
     }
 }
