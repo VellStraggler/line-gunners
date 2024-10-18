@@ -74,9 +74,11 @@ public class Window extends Frame {
         for (Object object: objects) {
             if (object instanceof Player) {
                 Player player = (Player) object;
+                offScreenGraphics.setColor(Color.lightGray);
+                offScreenGraphics.fillOval(player.getCornerPoint().x, player.getCornerPoint().y + player.height - 10,
+                        player.width, 20);
                 // BOMBS
                 if (player.willPlaceBomb) {
-                    drawingsGraphics.setColor(Color.lightGray);
                     drawingsGraphics.fillOval(player.getCenterPoint().x - player.height, player.getCenterPoint().y - player.height,
                             player.height * 2, player.height * 2); // using height since it's the biggest
                     player.willPlaceBomb = false;
@@ -112,9 +114,6 @@ public class Window extends Frame {
                         offScreenGraphics.drawImage(child.image, transform, this);
                     }
                 }
-
-
-//                offScreenGraphics.drawImage(sprite.image, cornerPoint.x, cornerPoint.y, this);
                 // draw a circle representing the geometry of each sprite
 //                offScreenGraphics.drawOval(cornerPoint.x, cornerPoint.y + (sprite.height/2) - (sprite.width/2), sprite.width, sprite.width);
 //                offScreenGraphics.drawRect(cornerPoint.x, cornerPoint.y, sprite.width, sprite.height);

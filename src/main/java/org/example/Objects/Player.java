@@ -113,4 +113,9 @@ public class Player extends Sprite{
     private boolean canPlaceBomb() {
         return System.currentTimeMillis() > timeLastFired + (bombCoolDown);
     }
+    public void kill() {
+        childrenSprites = null;
+        setFacing(1,0);
+        setImage("grave.png");
+    }
 }

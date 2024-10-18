@@ -51,7 +51,7 @@ public class Main {
 
         //start timer
         long currFrame;
-        long milsPerFrame = 1000 / 120;
+        long milsPerFrame = 1000 / 150;
         long nextFrame = System.currentTimeMillis() + milsPerFrame;
         int nextSecond = LocalTime.now().getSecond() + 1;
         int inc = 0;
@@ -116,10 +116,26 @@ public class Main {
     private static void approveMovement() {
         List<Object> movingObjects = new ArrayList<>();
         for (Object object: objects) {
-            if(object.wantsToMove()) { //FIXME takes non-moving players
+            if(object.wantsToMove()) {
                 movingObjects.add(object);
             }
         }
+
+        if(drawingsLayer != null) {
+            for(Player player: players) {
+                // Check if anyone is hit
+                for (int y = player.getCornerPoint().y; y < player.getCornerPoint().y + player.height; y++) {
+                    for (int x = player.getCornerPoint().x; x < player.getCornerPoint().x + player.width; x++) {
+                        Color color = new Color(drawingsLayer.getRGB(x, y), false);
+                        if (color.equals(Color.red)) {
+                            runGame = false;
+                            player.kill();
+                        }
+                    }
+                }
+            }
+        }
+
         // Look at each moving object, not including projectiles
         for (Object movingObject: movingObjects) {
             boolean canMove = true;
@@ -146,15 +162,7 @@ public class Main {
                 // Compare its geometry to the lines on the drawingLayer
                 Point requestedCorner = new Point(movingObject.getCornerPoint().x + movingObject.getRequestedChange().x,
                     movingObject.getCornerPoint().y + movingObject.getRequestedChange().y);
-                // Check if anyone is hit
                 if (drawingsLayer != null) {
-                    for (int y = movingObject.getCornerPoint().y; y < movingObject.getCornerPoint().y + movingObject.height; y++) {
-                        for (int x = movingObject.getCornerPoint().x; x < movingObject.getCornerPoint().x + movingObject.width; x++) {
-                            if (new Color(drawingsLayer.getRGB(x, y), true).equals(Color.red)) {
-                                runGame = false;
-                            }
-                        }
-                    }
                     for (int y = requestedCorner.y; y < requestedCorner.y + movingObject.height; y++) {
                         for (int x = requestedCorner.x; x < requestedCorner.x + movingObject.width; x++) {
                             if (new Color(drawingsLayer.getRGB(x, y), true).equals(Color.red)) {
