@@ -9,7 +9,6 @@ import static org.example.Window.CENTER;
  * Parent class to Sprite, HudItem, and Projectile
  */
 public class Object {
-    public static final int zLevel = 0;
 
     private Point cornerPoint;
     private Point centerPoint;
@@ -18,6 +17,7 @@ public class Object {
 
     public int width;
     public int height;
+    public Point geometry; //this is the width and height of the geometry from the center of the sprite
 
 
     /**
@@ -31,6 +31,7 @@ public class Object {
         centerPoint = new Point(0,0);
         cornerPoint = new Point(0,0);
         updateCenter(spawnPoint);
+        geometry = new Point(width, height);
 
     }
     public boolean wantsToMove() {

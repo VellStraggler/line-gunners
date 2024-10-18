@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.signum;
@@ -13,9 +14,6 @@ import static java.lang.Integer.signum;
  * circular collision geometry for players
  */
 public class Sprite extends Object{
-
-    public static final int zLevel = 1;
-
     private static final String PATH_PREFIX = "images/";
 
     public List<Sprite> childrenSprites;
@@ -32,6 +30,8 @@ public class Sprite extends Object{
     public int speed;
     private boolean facingLeft;
 
+    public double timeOfLastFrame = 0;
+
 
     /**
      * By default, the sprite is facing east
@@ -44,9 +44,15 @@ public class Sprite extends Object{
         this.imagePath = imagePath;
         rotation = 0.0;
         facingLeft = false;
-        direction = new Point(1,0);
+        direction = new Point(1, 0);
         speed = 0;
 
+        setImage(imagePath);
+        updateCorner(spawnPoint); // accounts for previously null width and height
+    }
+    public Image setImage(String imagePath) {
+        this.imagePath = imagePath;
+        Image oldImage = image;
         try {
             image = ImageIO.read(new File(PATH_PREFIX + imagePath));
             width = image.getWidth(null);
@@ -55,8 +61,51 @@ public class Sprite extends Object{
             System.out.println("Image could not be loaded with path: " + PATH_PREFIX + imagePath);
             e.printStackTrace();
         }
-        updateCorner(spawnPoint); // accounts for previously null width and height
+        return oldImage;
 
+    }
+
+    /**
+     * Assumes a syntax of "Name" + frame number + ".png"
+     * there's a maximum of 10 frames you can have
+     * @return
+     */
+    public void nextFrame() {
+        int nextFrame = Integer.parseInt(imagePath.substring(imagePath.length()-5, imagePath.length()-4)) + 1;
+        nextFrame = Math.min(nextFrame, 9);
+        setImage(imagePath.substring(0,imagePath.length()-5) + nextFrame + ".png");
+        timeOfLastFrame = System.currentTimeMillis();
+    }
+
+    /**
+     * see nextFrame()
+     */
+    public void prevFrame() {
+        int prevFrame = Integer.parseInt(imagePath.substring(imagePath.length()-5, imagePath.length()-4)) - 1;
+        prevFrame = Math.max(prevFrame, 1);
+        setImage(imagePath.substring(0,imagePath.length()-5) + prevFrame + ".png");
+        timeOfLastFrame = System.currentTimeMillis();
+    }
+
+    /**
+     * I probably should just store this as a variable, but oh well.
+     * @return
+     */
+    public int getFrame() {
+        return Integer.parseInt(imagePath.substring(imagePath.length()-5, imagePath.length()-4)) - 1;
+    }
+    public void setFrame(int f) {
+        setImage(imagePath.substring(0,imagePath.length()-5) + f + ".png");
+        timeOfLastFrame = System.currentTimeMillis();
+    }
+    public void addChildSprite(Sprite child) {
+        if(childrenSprites == null) {
+            childrenSprites = new ArrayList<>();
+        }
+        childrenSprites.add(child);
+    }
+    public boolean hasChildren() {
+        return childrenSprites != null;
     }
     /**
      * Rotates the current sprite and all childrenSprites
@@ -81,13 +130,6 @@ public class Sprite extends Object{
         rotation = (rotation + addedRotation)%360;
         if (rotation < 0) {
             rotation += 360;
-        }
-    }
-    public boolean wantsToMove() {
-        if (!super.wantsToMove()) {
-            return (direction.x != 0 || direction.y != 0);
-        } else {
-            return true;
         }
     }
 

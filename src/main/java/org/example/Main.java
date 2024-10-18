@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static Player player1 = new Player("lineguy-armless.png", new Point(64, Window.HEIGHT / 2));
-    public static Player player2 = new Player("lineguy-armless.png", new Point(Window.WIDTH - 128, Window.HEIGHT / 2));
+    // players and projectiles both count as objects, so they are also kept in the object list
+    public static Player player1 = new Player(new Point(64, Window.HEIGHT / 2));
+    public static Player player2 = new Player(new Point(Window.WIDTH - 128, Window.HEIGHT / 2));
     public static boolean[] keys = new boolean[256];
+    public static List<Player> players = List.of(player1, player2);
     public static List<Object> objects = new ArrayList<>();
     public static List<Projectile> projectiles = new ArrayList<>();
     public static BufferedImage drawingsLayer;
@@ -61,6 +63,7 @@ public class Main {
                 nextFrame = currFrame + milsPerFrame;
                 moveProjectiles();
                 getMovementRequests();
+                animatePlayers();
                 approveMovement();
                 //update screen
                 window.repaint();
@@ -84,6 +87,25 @@ public class Main {
 
         }
         System.out.println("Game over! Not a clue who won, figure it out.");
+    }
+    private static void animatePlayers() {
+        for(Player player: players) {
+            if(player.wantsToMove()) {
+                if (System.currentTimeMillis() >= player.timeOfLastFrame + Player.FRAME_LENGTH) {
+                    if (player.getFrame()+1 >= Player.BODY_FRAMES) {
+                        player.setFrame(1);
+                    } else {
+                        player.nextFrame();
+                    }
+                }
+            }
+            if (System.currentTimeMillis() >= player.timeLastReload + Player.RELOAD_TIME) {
+                if (player.backpack.getFrame()+1 < Player.BACKPACK_FRAMES) {
+                    player.backpack.nextFrame();
+                    player.timeLastReload = System.currentTimeMillis();
+                }
+            }
+        }
     }
     private static void moveProjectiles() {
         for (Projectile projectile: projectiles) {
@@ -112,9 +134,11 @@ public class Main {
     //                            object.getCenterPoint(),movingObject.width/2, object.width/2) < 0) {
     //                        canMove = false;
     //                    }
+
+
                         if (rectanglesOverlap(movingObject.getRequestedPoint(),
-                                new Point(movingObject.width, movingObject.height),
-                                object.getRequestedPoint(), new Point(object.width, object.height))) {
+                                new Point((movingObject).geometry.x, (movingObject).geometry.y),
+                                object.getRequestedPoint(), new Point(object.geometry.x, object.geometry.y))) {
                             canMove = false;
                         }
                     }

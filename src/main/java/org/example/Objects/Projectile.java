@@ -2,8 +2,8 @@ package org.example.Objects;
 
 import java.awt.*;
 
+
 public class Projectile extends Sprite{
-    public static final int zLevel = -1;
     public Point direction;
 
     public Projectile(String path, Point spawnPoint, Point direction, int speed) {

@@ -76,18 +76,16 @@ public class Window extends Frame {
                 Player player = (Player) object;
                 // BOMBS
                 if (player.willPlaceBomb) {
-                    drawingsGraphics.setColor(Color.white);
-                    drawingsGraphics.fillOval(player.getCenterPoint().x - player.width, player.getCenterPoint().y - player.height,
-                            player.width * 2, player.height * 2);
+                    drawingsGraphics.setColor(Color.lightGray);
+                    drawingsGraphics.fillOval(player.getCenterPoint().x - player.height, player.getCenterPoint().y - player.height,
+                            player.height * 2, player.height * 2); // using height since it's the biggest
                     player.willPlaceBomb = false;
                 }
             }
             if (object instanceof Sprite) {
-                Sprite sprite = (Sprite) object;
-
-                transform = new AffineTransform();
-
+                Sprite sprite = (Sprite) object; //Draw the parent first
                 Point cornerPoint = sprite.getCornerPoint();
+                transform = new AffineTransform();
                 //flip images as necessary
                 if (sprite.isFacingLeft()) {
                     transform.translate(cornerPoint.x + sprite.width, cornerPoint.y);
@@ -95,8 +93,27 @@ public class Window extends Frame {
                 } else {
                     transform.translate(cornerPoint.x, cornerPoint.y);
                 }
-
                 offScreenGraphics.drawImage(sprite.image, transform, this);
+
+                //Draw the children over it.
+                if(sprite.hasChildren()) {
+                    for(Sprite child: sprite.childrenSprites) {
+                        Point childCorner = child.getCornerPoint();
+                        transform = new AffineTransform();
+                        //flip images as necessary
+                        if (sprite.isFacingLeft()) {
+                            transform.translate(cornerPoint.x + sprite.width - childCorner.x,
+                                    cornerPoint.y + childCorner.y);
+                            transform.scale(-1, 1);
+                        } else {
+                            transform.translate(cornerPoint.x + childCorner.x,
+                                        cornerPoint.y + childCorner.y);
+                        }
+                        offScreenGraphics.drawImage(child.image, transform, this);
+                    }
+                }
+
+
 //                offScreenGraphics.drawImage(sprite.image, cornerPoint.x, cornerPoint.y, this);
                 // draw a circle representing the geometry of each sprite
 //                offScreenGraphics.drawOval(cornerPoint.x, cornerPoint.y + (sprite.height/2) - (sprite.width/2), sprite.width, sprite.width);
