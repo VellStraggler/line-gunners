@@ -5,10 +5,13 @@ import org.example.Objects.Player;
 import org.example.Objects.Projectile;
 import org.example.Objects.Sprite;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class Window extends Frame {
@@ -53,8 +56,14 @@ public class Window extends Frame {
     // Override the paint method for double-buffered drawing
     public void paint(Graphics2D g) {
         if (offScreenImage == null || drawingsLayer == null) {
-            offScreenImage = createImage(WIDTH, HEIGHT);
-            drawingsLayer = (BufferedImage) createImage(WIDTH, HEIGHT);
+            try {
+                drawingsLayer = ImageIO.read(new File(Sprite.PATH_PREFIX + "map.png"));
+            } catch (IOException e) {
+                System.out.println("Image could not be loaded with path: " + Sprite.PATH_PREFIX + "map.png");
+                e.printStackTrace();
+            }
+                offScreenImage = createImage(WIDTH, HEIGHT);
+//            drawingsLayer = (BufferedImage) createImage(WIDTH, HEIGHT);
             offScreenGraphics = (Graphics2D) offScreenImage.getGraphics();
             // this directly modifies the offScreenImage, which is
             // then drawn to the main graphics g
@@ -66,9 +75,16 @@ public class Window extends Frame {
 
         // Draw the images onto the drawingsGraphics image
         for (Projectile object: projectiles) {
-            drawingsGraphics.setColor(Color.red);
-            drawingsGraphics.drawRect(object.getCornerPoint().x + 3, object.getCornerPoint().y + 3, 2, 2);
-            // this is never cleared like the offscreen
+            double timeAlive = System.currentTimeMillis() - object.birthTime;
+            if(timeAlive > 300) {
+//                drawingsGraphics.setColor(Color.gray);
+//                drawingsGraphics.fillRect(object.getCornerPoint().x + 3, object.getCornerPoint().y + 3, 4, 50);
+                int newWidth = (int)timeAlive/50;
+                drawingsGraphics.setColor(Color.red);
+                drawingsGraphics.fillOval(object.getCornerPoint().x + 3 - (newWidth/2), object.getCornerPoint().y + 3 - (newWidth/2),
+                        newWidth, newWidth);
+                // this is never cleared like the offscreen
+            }
         }
         offScreenGraphics.drawImage(drawingsLayer,0 ,0, this);
         for (Object object: objects) {
@@ -79,8 +95,9 @@ public class Window extends Frame {
                         player.width, 20);
                 // BOMBS
                 if (player.willPlaceBomb) {
-                    drawingsGraphics.fillOval(player.getCenterPoint().x - player.height, player.getCenterPoint().y - player.height,
-                            player.height * 2, player.height * 2); // using height since it's the biggest
+                    drawingsGraphics.setColor(Color.lightGray);
+                    drawingsGraphics.fillOval(player.getCenterPoint().x - player.height, player.getCenterPoint().y - (player.height/3),
+                            player.height * 2, player.height * 3/2); // using height since it's the biggest
                     player.willPlaceBomb = false;
                 }
             }

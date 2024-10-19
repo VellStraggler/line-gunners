@@ -5,7 +5,7 @@ import org.example.Window;
 import java.awt.*;
 
 public class Player extends Sprite{
-    public static final Point PLAYER_SIZE = new Point(80,118);
+    public static final Point PLAYER_SIZE = new Point(80,80);
     public static final Point faceSpawnPoint = new Point(28,10);
     public static final int BODY_FRAMES = 4;
     public static final int BACKPACK_FRAMES = 5;
@@ -102,16 +102,16 @@ public class Player extends Sprite{
         this.timeLastReload = System.currentTimeMillis();
         if (timeLastReload > timeLastFired + (laserCoolDown)) {
             int frame = backpack.getFrame();
-            if (frame < 1) {
-                return false;
-            }
-            return true;
+            return frame >= 1;
         }
         return false;
-//        return (timeLastReload > timeLastFired + (laserCoolDown) && getFrame() != 1);
     }
     private boolean canPlaceBomb() {
-        return System.currentTimeMillis() > timeLastFired + (bombCoolDown);
+        this.timeLastReload = System.currentTimeMillis();
+        if (timeLastReload > timeLastFired + (bombCoolDown)) {
+            return backpack.getFrame() >= 1;
+        }
+        return false;
     }
     public void kill() {
         childrenSprites = null;

@@ -14,7 +14,7 @@ import static java.lang.Integer.signum;
  * circular collision geometry for players
  */
 public class Sprite extends Object{
-    private static final String PATH_PREFIX = "images/";
+    public static final String PATH_PREFIX = "images/";
 
     public List<Sprite> childrenSprites;
     public Sprite parentSprite; // This is the highest-level sprite if parentSprite is null.

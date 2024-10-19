@@ -122,10 +122,11 @@ public class Main {
         }
 
         if(drawingsLayer != null) {
+            // Geometry starts from the bottom center
             for(Player player: players) {
                 // Check if anyone is hit
-                for (int y = player.getCornerPoint().y; y < player.getCornerPoint().y + player.height; y++) {
-                    for (int x = player.getCornerPoint().x; x < player.getCornerPoint().x + player.width; x++) {
+                for (int y = player.getCornerPoint().y+player.height- player.geometry.y + 1; y < player.getCornerPoint().y + player.height; y++) {
+                    for (int x = player.getCornerPoint().x+(player.width/2)-(player.geometry.x/2); x < player.getCornerPoint().x + (player.width/2) + (player.geometry.x/2); x++) {
                         Color color = new Color(drawingsLayer.getRGB(x, y), false);
                         if (color.equals(Color.red)) {
                             runGame = false;
@@ -163,9 +164,11 @@ public class Main {
                 Point requestedCorner = new Point(movingObject.getCornerPoint().x + movingObject.getRequestedChange().x,
                     movingObject.getCornerPoint().y + movingObject.getRequestedChange().y);
                 if (drawingsLayer != null) {
-                    for (int y = requestedCorner.y; y < requestedCorner.y + movingObject.height; y++) {
-                        for (int x = requestedCorner.x; x < requestedCorner.x + movingObject.width; x++) {
-                            if (new Color(drawingsLayer.getRGB(x, y), true).equals(Color.red)) {
+                    Object player = movingObject;
+                    for (int y = player.getRequestedPoint().y+(player.height/2)- player.geometry.y; y < player.getRequestedPoint().y + (player.height/2); y++) {
+                        for (int x = player.getRequestedPoint().x-(player.geometry.x/2); x < player.getRequestedPoint().x + (player.geometry.x/2); x++) {
+                            Color color = new Color (drawingsLayer.getRGB(x, y), true);
+                            if (color.equals(Color.red) || color.equals(Color.BLACK)) {
                                 canMove = false;
                                 break;
                             }
